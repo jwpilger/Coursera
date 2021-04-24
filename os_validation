@@ -1,0 +1,36 @@
+#OS validation
+import os,sys,platform
+import pandas as pd
+
+
+def os_info(filename):
+    # Get some infos from the builtin os.uname API...
+    no_os_uname = 0
+    system = ''; release=''; machine = ''; release =''; node=''; version =''; processor=''
+    try:
+        system, node, release, version, machine,processor = platform.uname()
+    except AttributeError:
+        no_os_uname = 1
+
+        if no_os_uname:
+            system = sys.platform
+            release = ''
+            version = ''
+            node = _node()
+            machine = ''
+    
+    if system == 'Darwin':
+        release, version, machine = platform.mac_ver()
+        system = "mac"
+    if system == 'mac':
+        filename = filename[9:]
+    if system == 'nt':
+         filename = filename[8:]
+    return os.path.realpath(filename),os.path.basename(filename),system,release,version,node,machine,processor
+         
+filename='${Internal.Transformation.Filename.Directory}/models/svm.metrics.model'
+            
+file_info = pd.Series(os_info(filename)).T
+
+print(file_info)
+
